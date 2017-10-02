@@ -1,19 +1,13 @@
-package com.flawyless.launch;
+package com.flawyless;
 
 import com.flawyless.model.Card;
 import com.flawyless.repository.CardRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan(resourcePattern = "com.flawyless")
-@EntityScan(basePackages = {"com.flawyless.model"})
-@EnableJpaRepositories(basePackages = {"com.flawyless.repository"})
 public class ApplicationLauncher {
 
     public static void main(String[] args) {
