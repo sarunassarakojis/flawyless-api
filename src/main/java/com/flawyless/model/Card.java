@@ -37,4 +37,9 @@ public class Card {
     public String getDescription() {
         return description;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Card[id=%s, summary=%s, description=%s]", id, summary, description);
+    }
 }
