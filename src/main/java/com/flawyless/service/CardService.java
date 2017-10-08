@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class CardService {
 
-    @Autowired
     private CardRepository cardRepository;
+
+    @Autowired
+    public CardService(CardRepository cardRepository) {
+        this.cardRepository = cardRepository;
+    }
 }
