@@ -12,9 +12,10 @@ import java.net.URI;
 import java.util.Collection;
 
 @RestController
-@RequestMapping(value = "/cards")
+@RequestMapping(value = CardController.CARD_API)
 public class CardController {
 
+    public static final String CARD_API = "/cards";
     private final CardRepository cardRepository;
     private final CardService cardService;
 
