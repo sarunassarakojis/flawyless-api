@@ -1,7 +1,12 @@
 package com.flawyless.repository;
 
 import com.flawyless.model.Card;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface CardRepository extends CrudRepository<Card, Long> {
+import java.util.Optional;
+
+@Repository
+public interface CardRepository extends JpaRepository<Card, Long> {
+    Optional<Card> findBySummary(String summary);
 }

@@ -1,28 +1,77 @@
 package com.flawyless.controller;
 
 import com.flawyless.model.Card;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.flawyless.repository.CardRepository;
+import com.flawyless.service.CardService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URI;
+import java.util.Collection;
 
 @RestController
+@RequestMapping(value = CardController.CARD_API)
 public class CardController {
 
-    @RequestMapping(name = "/")
-    public String index() {
-        return "mvc test";
+    public static final String CARD_API = "/cards";
+    private final CardRepository cardRepository;
+    private final CardService cardService;
+
+    @Autowired
+    public CardController(CardRepository cardRepository, CardService cardService) {
+        this.cardRepository = cardRepository;
+        this.cardService = cardService;
     }
 
-    @RequestMapping("/cards")
-    public Iterable<Card> getAllCards() {
-        List<Card> cards = new ArrayList<>();
+    @RequestMapping(method = RequestMethod.GET)
+    public Collection<Card> readAllCards() {
+        return cardRepository.findAll();
+    }
 
-        cards.add(new Card("summary_0", "desc"));
-        cards.add(new Card("summary_1", "desc"));
-        cards.add(new Card("summary_2", "desc"));
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public ResponseEntity<Card> readCard(@PathVariable Long id) {
+        Card card = cardRepository.findOne(id);
 
-        return cards;
+        return card != null ? ResponseEntity.ok(card) : ResponseEntity.notFound().build();
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<Card> addCard(@RequestBody Card card) {
+        Card newCard = cardRepository.save(card);
+        URI newCardLocation = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(newCard.getId()).toUri();
+
+        return ResponseEntity.created(newCardLocation).build();
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<Card> updateCard(@RequestBody Card newCard, @PathVariable Long id) {
+        Card card = cardRepository.findOne(id);
+
+        if (card != null) {
+            updateCardValues(card, newCard);
+
+            return ResponseEntity.ok(cardRepository.save(card));
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Card> deleteCard(@PathVariable Long id) {
+        if (cardRepository.findOne(id) != null) {
+            cardRepository.delete(id);
+
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    private void updateCardValues(Card toUpdate, Card updater) {
+        toUpdate.setSummary(updater.getSummary());
+        toUpdate.setDescription(updater.getDescription());
     }
 }

@@ -37,4 +37,17 @@ public class Card {
     public String getDescription() {
         return description;
     }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Card[id=%s, summary=%s, description=%s]", id, summary, description);
+    }
 }
