@@ -30,9 +30,9 @@ public class CardController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<Card> readCard(@PathVariable Long id) {
-        Optional<Card> card = cardService.getCardById(id);
-
-        return card.isPresent() ? ResponseEntity.ok(card.get()) : ResponseEntity.notFound().build();
+        return cardService.getCardById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @RequestMapping(method = RequestMethod.POST)
