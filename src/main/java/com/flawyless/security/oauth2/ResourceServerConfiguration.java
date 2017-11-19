@@ -1,4 +1,4 @@
-package com.flawyless;
+package com.flawyless.security.oauth2;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

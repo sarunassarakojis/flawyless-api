@@ -1,4 +1,4 @@
-package com.flawyless;
+package com.flawyless.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
