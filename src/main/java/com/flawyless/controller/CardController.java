@@ -40,7 +40,7 @@ public class CardController {
         URI newCardLocation = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(newCard.getId()).toUri();
 
-        return ResponseEntity.created(newCardLocation).build();
+        return ResponseEntity.created(newCardLocation).body(newCard);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)

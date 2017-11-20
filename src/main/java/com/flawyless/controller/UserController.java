@@ -40,7 +40,7 @@ public class UserController {
         URI newUserLocation = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(newUser.getId()).toUri();
 
-        return ResponseEntity.created(newUserLocation).build();
+        return ResponseEntity.created(newUserLocation).body(newUser);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
