@@ -21,9 +21,11 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.requestMatchers().antMatchers(ControllerConstants.CARD_API_URL + "/**")
+        http.requestMatchers().antMatchers(ControllerConstants.CARD_API_URL + "/**",
+                ControllerConstants.USER_API_URL + "/**")
                 .and()
-                .authorizeRequests().antMatchers(ControllerConstants.CARD_API_URL + "/**")
+                .authorizeRequests().antMatchers(ControllerConstants.CARD_API_URL + "/**",
+                ControllerConstants.USER_API_URL + "/**")
                 .access("hasRole('ROLE_USER')")
                 .and()
                 .exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());
