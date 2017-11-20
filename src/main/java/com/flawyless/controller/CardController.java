@@ -12,10 +12,9 @@ import java.util.Collection;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = CardController.CARD_API)
+@RequestMapping(value = ControllerConstants.CARD_API_URL)
 public class CardController {
 
-    public static final String CARD_API = "/cards";
     private final CardService cardService;
 
     @Autowired
@@ -47,15 +46,11 @@ public class CardController {
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Card> updateCard(@RequestBody Card newCard, @PathVariable Long id) {
         Optional<Card> card = cardService.getCardById(id);
-        Card replacement;
 
-        if (card.isPresent()) {
-            updateCardValues(replacement = card.get(), newCard);
+        newCard.setId(id);
 
-            return ResponseEntity.ok(cardService.saveCard(replacement));
-        }
-
-        return ResponseEntity.notFound().build();
+        return card.isPresent() ? ResponseEntity.ok(cardService.saveCard(newCard))
+                : ResponseEntity.notFound().build();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -67,10 +62,5 @@ public class CardController {
         }
 
         return ResponseEntity.notFound().build();
-    }
-
-    private void updateCardValues(Card toUpdate, Card updater) {
-        toUpdate.setSummary(updater.getSummary());
-        toUpdate.setDescription(updater.getDescription());
     }
 }

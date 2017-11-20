@@ -38,6 +38,10 @@ public class Card {
         return description;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public void setSummary(String summary) {
         this.summary = summary;
     }

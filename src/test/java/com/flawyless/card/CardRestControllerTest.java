@@ -1,7 +1,7 @@
 package com.flawyless.card;
 
 import com.flawyless.ApplicationLauncher;
-import com.flawyless.controller.CardController;
+import com.flawyless.controller.ControllerConstants;
 import com.flawyless.model.Card;
 import com.flawyless.repository.CardRepository;
 import org.junit.Before;
@@ -25,12 +25,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApplicationLauncher.class)
@@ -65,7 +64,7 @@ public class CardRestControllerTest {
 
     @Test
     public void attemptToReadAllCards() throws Exception {
-        ResultActions resultActions = mockMvc.perform(get(CardController.CARD_API));
+        ResultActions resultActions = mockMvc.perform(get(ControllerConstants.CARD_API_URL));
 
         resultActions.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -77,7 +76,7 @@ public class CardRestControllerTest {
     public void attemptToReadSingleCard() throws Exception {
         Card testCard = testCards.get(0);
 
-        mockMvc.perform(get(CardController.CARD_API + "/" + testCard.getId()))
+        mockMvc.perform(get(ControllerConstants.CARD_API_URL + "/" + testCard.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.id", is((int) testCard.getId())))
@@ -89,7 +88,7 @@ public class CardRestControllerTest {
     public void readCardThatDoesNotExist() throws Exception {
         long lastCardId = testCards.get(testCards.size() - 1).getId();
 
-        mockMvc.perform(get(CardController.CARD_API + "/" + (lastCardId + 1)))
+        mockMvc.perform(get(ControllerConstants.CARD_API_URL + "/" + (lastCardId + 1)))
                 .andExpect(status().isNotFound());
     }
 
@@ -97,7 +96,7 @@ public class CardRestControllerTest {
     public void attemptToCreateNewCard() throws Exception {
         String cardJson = jsonify(new Card("sample_summary", "sample_description"));
 
-        mockMvc.perform(post(CardController.CARD_API)
+        mockMvc.perform(post(ControllerConstants.CARD_API_URL)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(cardJson))
                 .andExpect(status().isCreated());
