@@ -27,8 +27,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -76,12 +75,11 @@ public class CardRestControllerTest {
     public void attemptToReadSingleCard() throws Exception {
         Card testCard = testCards.get(0);
 
-        mockMvc.perform(get(ControllerConstants.CARD_API_URL + "/" + testCard.getId()))
+        ResultActions resultActions = mockMvc.perform(get(ControllerConstants.CARD_API_URL + "/" + testCard.getId()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.id", is((int) testCard.getId())))
-                .andExpect(jsonPath("$.summary", is(testCard.getSummary())))
-                .andExpect(jsonPath("$.description", is(testCard.getDescription())));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
+
+        assertCardContentCorrectness(testCard, resultActions);
     }
 
     @Test
@@ -94,26 +92,61 @@ public class CardRestControllerTest {
 
     @Test
     public void attemptToCreateNewCard() throws Exception {
-        String cardJson = jsonify(new Card("sample_summary", "sample_description"));
+        Card testCard = new Card("sample_summary", "sample_description");
 
-        mockMvc.perform(post(ControllerConstants.CARD_API_URL)
+        ResultActions resultActions = mockMvc.perform(post(ControllerConstants.CARD_API_URL)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(cardJson))
-                .andExpect(status().isCreated());
+                .content(jsonify(testCard)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
+
+        assertCardContentCorrectness(testCard, resultActions);
+    }
+
+    @Test
+    public void attemptToUpdateCard() throws Exception {
+        Card testCard = testCards.get(0);
+
+        testCard.setDescription(testCard.getDescription() + System.currentTimeMillis());
+        ResultActions resultActions = mockMvc.perform(put(ControllerConstants.CARD_API_URL + "/" + testCard.getId())
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(jsonify(testCard)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
+
+        assertCardContentCorrectness(testCard, resultActions);
+    }
+
+    @Test
+    public void attemptToDeleteCard() throws Exception {
+        Card testCard = testCards.get(0);
+
+        mockMvc.perform(delete(ControllerConstants.CARD_API_URL + "/" + testCard.getId()))
+                .andExpect(status().isOk());
+        mockMvc.perform(get(ControllerConstants.CARD_API_URL + "/" + testCard.getId()))
+                .andExpect(status().isNotFound());
+    }
+
+    private static void assertCardContentCorrectness(Card expectedCard, ResultActions resultActions) throws Exception {
+        resultActions.andExpect(jsonPath(createJsonPath("summary"), is(expectedCard.getSummary())))
+                .andExpect(jsonPath(createJsonPath("description"), is(expectedCard.getDescription())));
     }
 
     private static void assertCardContentCorrectness(List<Card> expectedCards, ResultActions resultActions) throws Exception {
         for (int i = 0, n = expectedCards.size(); i < n; i++) {
             Card card = expectedCards.get(i);
 
-            resultActions.andExpect(jsonPath(createJsonPath(i, "id"), is((int) card.getId())))
-                    .andExpect(jsonPath(createJsonPath(i, "summary"), is(card.getSummary())))
+            resultActions.andExpect(jsonPath(createJsonPath(i, "summary"), is(card.getSummary())))
                     .andExpect(jsonPath(createJsonPath(i, "description"), is(card.getDescription())));
         }
     }
 
     private static String createJsonPath(int objectIndex, String fieldName) {
         return String.format("$[%d].%s", objectIndex, fieldName);
+    }
+
+    private static String createJsonPath(String fieldName) {
+        return String.format("$.%s", fieldName);
     }
 
     private String jsonify(Object o) throws IOException {
