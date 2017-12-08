@@ -3,6 +3,7 @@ package com.flawyless.controller;
 import com.flawyless.model.Card;
 import com.flawyless.service.CardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -55,12 +56,12 @@ public class CardController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Card> deleteCard(@PathVariable Long id) {
-        if (cardService.getCardById(id).isPresent()) {
+        try {
             cardService.deleteCard(id);
-
-            return ResponseEntity.ok().build();
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().build();
     }
 }

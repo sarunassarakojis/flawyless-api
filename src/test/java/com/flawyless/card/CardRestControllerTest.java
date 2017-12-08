@@ -127,6 +127,12 @@ public class CardRestControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void attemptToDeleteCardThatDoesNotExist() throws Exception {
+        mockMvc.perform(delete(ControllerConstants.CARD_API_URL + "/-1"))
+                .andExpect(status().isNotFound());
+    }
+
     private static void assertCardContentCorrectness(Card expectedCard, ResultActions resultActions) throws Exception {
         resultActions.andExpect(jsonPath(createJsonPath("summary"), is(expectedCard.getSummary())))
                 .andExpect(jsonPath(createJsonPath("description"), is(expectedCard.getDescription())));
